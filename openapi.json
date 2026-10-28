@@ -67,10 +67,10 @@
           "en": "Available KEYPLO credit",
           "ru": "Доступный баланс KEYPLO"
         },
-        "description": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled=false. Credit is managed personally by the owner; there is no public deposit API.",
+        "description": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled. With a connected supplier, customers can create crypto top-up invoices in the Wallet page. Credit is added only after confirmed provider payment and credit. There is no public invoice-creation API endpoint.",
         "x-description": {
-          "en": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled=false. Credit is managed personally by the owner; there is no public deposit API.",
-          "ru": "Возвращает USD, целый balance_minor в центах, строку balance и funding_enabled=false. Кредит начисляет владелец; публичного API пополнения нет."
+          "en": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled. With a connected supplier, customers can create crypto top-up invoices in the Wallet page. Credit is added only after confirmed provider payment and credit. There is no public invoice-creation API endpoint.",
+          "ru": "Возвращает USD, целый balance_minor в центах, строку balance и funding_enabled. При подключённом поставщике клиент создаёт счёт криптопополнения в кошельке. Кредит зачисляется только после подтверждения платежа и зачисления поставщиком. Публичного метода создания счетов API нет."
         },
         "responses": {
           "200": {
