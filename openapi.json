@@ -2,11 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "KEYPLO Merchant API",
-    "version": "1.0.0-prelaunch",
-    "description": "EN: Account API available. Catalog, purchases, funding and marketplace verification are not connected. RU: API аккаунта доступен. Каталог, покупки, пополнение и проверка площадок не подключены.",
-    "contact": {
-      "email": "partnerships@keyplo.com"
-    }
+    "version": "1.0.0",
+    "description": "EN: Server-side catalog, quotes, orders and balance API. RU: Серверный API каталога, цен, заказов и баланса."
   },
   "servers": [
     {
@@ -15,147 +12,49 @@
   ],
   "security": [
     {
-      "bearerAuth": []
+      "BearerAuth": []
     }
   ],
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Server-only API key created in the authenticated integration hub."
-      }
-    }
-  },
   "paths": {
     "/me": {
       "get": {
-        "summary": "Account and capabilities",
-        "description": "Аккаунт и возможности",
+        "summary": "Account & capabilities",
+        "x-summary": {
+          "en": "Account & capabilities",
+          "ru": "Аккаунт и возможности"
+        },
+        "description": "Returns account_id, business, api_version and capabilities. purchasing is true only when the supplier connection and purchasing setting are active.",
+        "x-description": {
+          "en": "Returns account_id, business, api_version and capabilities. purchasing is true only when the supplier connection and purchasing setting are active.",
+          "ru": "Возвращает account_id, business, api_version и capabilities. purchasing=true только при активном подключении и включённой покупке."
+        },
         "responses": {
           "200": {
-            "description": "Success / Успех",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "object"
-                        },
-                        {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
-                      ]
-                    },
-                    "meta": {
-                      "type": "object"
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
             }
           },
           "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
             }
           },
           "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
             }
           },
           "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
             }
           }
         }
@@ -163,132 +62,43 @@
     },
     "/balance": {
       "get": {
-        "summary": "Available USD balance",
-        "description": "Доступный баланс USD",
+        "summary": "Available KEYPLO credit",
+        "x-summary": {
+          "en": "Available KEYPLO credit",
+          "ru": "Доступный баланс KEYPLO"
+        },
+        "description": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled=false. Credit is managed personally by the owner; there is no public deposit API.",
+        "x-description": {
+          "en": "Returns currency USD, integer balance_minor (cents), decimal-string balance and funding_enabled=false. Credit is managed personally by the owner; there is no public deposit API.",
+          "ru": "Возвращает USD, целый balance_minor в центах, строку balance и funding_enabled=false. Кредит начисляет владелец; публичного API пополнения нет."
+        },
         "responses": {
           "200": {
-            "description": "Success / Успех",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "object"
-                        },
-                        {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
-                      ]
-                    },
-                    "meta": {
-                      "type": "object"
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
             }
           },
           "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
             }
           },
           "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
             }
           },
           "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
             }
           }
         }
@@ -296,131 +106,165 @@
     },
     "/products": {
       "get": {
-        "summary": "Catalog (not connected yet)",
-        "description": "Каталог (пока не подключён)",
+        "summary": "Catalog & categories",
+        "x-summary": {
+          "en": "Catalog & categories",
+          "ru": "Каталог и категории"
+        },
+        "description": "Without category_id returns categories (id/name). With category_id returns products: id, name, kind, currency, unit_price_minor, min_quantity, max_quantity, stock, fields and region. Telegram kinds return products directly. Use fields key (or code), required and options to construct the buyer form. Prices can change; request a quote before purchasing. No connected supplier returns an empty catalog.",
+        "x-description": {
+          "en": "Without category_id returns categories (id/name). With category_id returns products: id, name, kind, currency, unit_price_minor, min_quantity, max_quantity, stock, fields and region. Telegram kinds return products directly. Use fields key (or code), required and options to construct the buyer form. Prices can change; request a quote before purchasing. No connected supplier returns an empty catalog.",
+          "ru": "Без category_id возвращает categories (id/name). С category_id возвращает товары: id, name, kind, currency, unit_price_minor, min_quantity, max_quantity, stock, fields и region. Категории Telegram возвращают товары сразу. Поля key (или code), required и options определяют форму покупателя. Цена может измениться; запросите расчёт перед покупкой. Без поставщика каталог пуст."
+        },
         "responses": {
           "200": {
-            "description": "Success / Успех",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "object"
-                        },
-                        {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
-                      ]
-                    },
-                    "meta": {
-                      "type": "object"
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
             }
           },
           "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
             }
           },
           "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
             }
           },
           "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "description": "Product type; defaults to gift_card.",
+            "x-description": {
+              "en": "Product type; defaults to gift_card.",
+              "ru": "Тип товара; по умолчанию gift_card."
+            },
+            "schema": {
+              "type": "string",
+              "enum": [
+                "gift_card",
+                "game_key",
+                "topup",
+                "manual",
+                "steam_gift",
+                "telegram_stars",
+                "telegram_premium"
+              ]
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "description": "Category ID returned by the previous request.",
+            "x-description": {
+              "en": "Category ID returned by the previous request.",
+              "ru": "ID категории из предыдущего запроса."
+            },
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Opaque next_cursor for the next category page when supplied.",
+            "x-description": {
+              "en": "Opaque next_cursor for the next category page when supplied.",
+              "ru": "next_cursor для следующей страницы категорий, если передан."
+            },
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/quotes": {
+      "post": {
+        "summary": "Get a fresh total",
+        "x-summary": {
+          "en": "Get a fresh total",
+          "ru": "Получить актуальную сумму"
+        },
+        "description": "Read-only price check. Returns product_id, quantity, currency and total_minor. Does not reserve funds or create an order.",
+        "x-description": {
+          "en": "Read-only price check. Returns product_id, quantity, currency and total_minor. Does not reserve funds or create an order.",
+          "ru": "Проверка цены без покупки. Возвращает product_id, quantity, currency и total_minor. Не резервирует средства и не создаёт заказ."
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
+            }
+          },
+          "429": {
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
+            }
+          },
+          "503": {
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
+            }
+          },
+          "422": {
+            "description": "Invalid fields or quantity.",
+            "x-description": {
+              "en": "Invalid fields or quantity.",
+              "ru": "Неверные поля или количество."
+            }
+          },
+          "409": {
+            "description": "Price limit, insufficient balance or idempotency conflict.",
+            "x-description": {
+              "en": "Price limit, insufficient balance or idempotency conflict.",
+              "ru": "Предел цены, недостаточный баланс или конфликт идемпотентности."
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteRequest"
+              },
+              "example": {
+                "product_id": "kp_PRODUCT_ID_FROM_CATALOG",
+                "quantity": 1,
+                "fields": {}
               }
             }
           }
@@ -428,172 +272,75 @@
       }
     },
     "/orders": {
-      "get": {
-        "summary": "List your orders",
-        "description": "Список своих заказов",
+      "post": {
+        "summary": "Purchase a product",
+        "x-summary": {
+          "en": "Purchase a product",
+          "ru": "Купить товар"
+        },
+        "description": "Creates a real purchase using your KEYPLO credit. Send a stable Idempotency-Key (16–100 letters, digits, hyphens or underscores). Same key + same body returns the same order; different body returns 409. Never retry an unknown order with a new key. Responses contain the local id, status, amount_minor, currency, external_id and delivery codes when completed. HTTP 200 does not mean delivery is complete: inspect status. Pending supplier errors retain the reservation for reconciliation. No automatic retry of an uncertain supplier purchase.",
+        "x-description": {
+          "en": "Creates a real purchase using your KEYPLO credit. Send a stable Idempotency-Key (16–100 letters, digits, hyphens or underscores). Same key + same body returns the same order; different body returns 409. Never retry an unknown order with a new key. Responses contain the local id, status, amount_minor, currency, external_id and delivery codes when completed. HTTP 200 does not mean delivery is complete: inspect status. Pending supplier errors retain the reservation for reconciliation. No automatic retry of an uncertain supplier purchase.",
+          "ru": "Создаёт реальную покупку с баланса KEYPLO. Передавайте постоянный Idempotency-Key (16–100 букв, цифр, дефисов или подчёркиваний). Тот же ключ и тело возвращают тот же заказ; другое тело — 409. Не повторяйте неопределённый заказ с новым ключом. Ответ содержит локальный id, status, amount_minor, currency, external_id и коды delivery после выполнения. HTTP 200 не означает выдачу: проверьте status. При неопределённом ответе поставщика резерв сохраняется для сверки. Автоматического повторного выкупа нет."
+        },
         "responses": {
           "200": {
-            "description": "Success / Успех",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "object"
-                        },
-                        {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
-                      ]
-                    },
-                    "meta": {
-                      "type": "object"
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
             }
           },
           "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
             }
           },
           "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
             }
           },
           "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
+            }
+          },
+          "422": {
+            "description": "Invalid fields or quantity.",
+            "x-description": {
+              "en": "Invalid fields or quantity.",
+              "ru": "Неверные поля или количество."
+            }
+          },
+          "409": {
+            "description": "Price limit, insufficient balance or idempotency conflict.",
+            "x-description": {
+              "en": "Price limit, insufficient balance or idempotency conflict.",
+              "ru": "Предел цены, недостаточный баланс или конфликт идемпотентности."
             }
           }
         },
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100000,
-              "default": 0
-            }
-          }
-        ]
-      },
-      "post": {
-        "summary": "Order request contract — purchasing disabled",
-        "description": "Контракт заказа: покупки пока отключены. Valid requests return 503 PURCHASING_NOT_ENABLED; no charge or order is created. Idempotency storage, supplier fulfillment and accounting must be implemented before this gate opens.",
-        "parameters": [
-          {
             "name": "Idempotency-Key",
             "in": "header",
             "required": true,
+            "description": "Stable key for this logical purchase.",
+            "x-description": {
+              "en": "Stable key for this logical purchase.",
+              "ru": "Постоянный ключ этой покупки."
+            },
             "schema": {
               "type": "string",
               "minLength": 16,
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_-]+$"
+              "maxLength": 100
             }
           }
         ],
@@ -602,416 +349,133 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "product_id",
-                  "external_id",
-                  "quantity",
-                  "fields"
-                ],
-                "properties": {
-                  "product_id": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "pattern": "^[A-Za-z0-9_.:-]+$"
-                  },
-                  "external_id": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "pattern": "^[A-Za-z0-9_.:-]+$"
-                  },
-                  "quantity": {
-                    "type": "integer",
-                    "enum": [
-                      1
-                    ]
-                  },
-                  "fields": {
-                    "type": "object"
-                  }
-                }
+                "$ref": "#/components/schemas/OrderRequest"
               },
               "example": {
-                "product_id": "PRODUCT_ID",
-                "external_id": "YOUR_ORDER_ID",
+                "product_id": "kp_PRODUCT_ID_FROM_CATALOG",
                 "quantity": 1,
-                "fields": {}
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "415": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
+                "fields": {},
+                "external_id": "your-order-1001",
+                "max_total_minor": 1050
               }
             }
           }
         }
+      },
+      "get": {
+        "summary": "List your orders",
+        "x-summary": {
+          "en": "List your orders",
+          "ru": "Список ваших заказов"
+        },
+        "description": "Returns data and meta (limit, offset, total). Only this authenticated account is visible; newest first. List does not refresh provider status.",
+        "x-description": {
+          "en": "Returns data and meta (limit, offset, total). Only this authenticated account is visible; newest first. List does not refresh provider status.",
+          "ru": "Возвращает data и meta (limit, offset, total). Только заказы текущего аккаунта, новые первыми. Список не обновляет статус у поставщика."
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
+            }
+          },
+          "429": {
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
+            }
+          },
+          "503": {
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size, default 20.",
+            "x-description": {
+              "en": "Page size, default 20.",
+              "ru": "Размер страницы, по умолчанию 20."
+            },
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset, default 0.",
+            "x-description": {
+              "en": "Offset, default 0.",
+              "ru": "Смещение, по умолчанию 0."
+            },
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000
+            }
+          }
+        ]
       }
     },
     "/orders/{id}": {
       "get": {
-        "summary": "Get your order",
-        "description": "Получить свой заказ",
+        "summary": "Order status & delivery",
+        "x-summary": {
+          "en": "Order status & delivery",
+          "ru": "Статус и выдача заказа"
+        },
+        "description": "Returns only your own order; foreign or unknown ID returns 404. Known processing orders are refreshed from the supplier. States: reserved, submitting, processing, completed, failed, refunded, unknown, needs_review. Completed delivery codes appear in delivery. Confirmed refunds credit the original debit once; read errors never trigger refunds. Unknown/needs_review requires owner reconciliation.",
+        "x-description": {
+          "en": "Returns only your own order; foreign or unknown ID returns 404. Known processing orders are refreshed from the supplier. States: reserved, submitting, processing, completed, failed, refunded, unknown, needs_review. Completed delivery codes appear in delivery. Confirmed refunds credit the original debit once; read errors never trigger refunds. Unknown/needs_review requires owner reconciliation.",
+          "ru": "Возвращает только ваш заказ; чужой или неизвестный ID — 404. Выполняемые заказы с известным ID проверяются у поставщика. Статусы: reserved, submitting, processing, completed, failed, refunded, unknown, needs_review. Коды выполненного заказа — в delivery. Подтверждённый возврат зачисляется один раз; ошибка чтения не вызывает возврат. unknown/needs_review требуют сверки владельцем."
+        },
         "responses": {
           "200": {
-            "description": "Success / Успех",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "object"
-                        },
-                        {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
-                      ]
-                    },
-                    "meta": {
-                      "type": "object"
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Successful response in data. A request_id is always included.",
+            "x-description": {
+              "en": "Successful response in data. A request_id is always included.",
+              "ru": "Успешный ответ в data. request_id включается всегда."
             }
           },
           "401": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Invalid, revoked or suspended account key.",
+            "x-description": {
+              "en": "Invalid, revoked or suspended account key.",
+              "ru": "Неверный, отозванный ключ или приостановленный аккаунт."
             }
           },
           "429": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Rate limited. Retry-After: 60.",
+            "x-description": {
+              "en": "Rate limited. Retry-After: 60.",
+              "ru": "Превышен лимит. Retry-After: 60."
             }
           },
           "503": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Error / Ошибка",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "error",
-                    "request_id"
-                  ],
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "request_id": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+            "description": "Connection unavailable or purchasing disabled.",
+            "x-description": {
+              "en": "Connection unavailable or purchasing disabled.",
+              "ru": "Подключение недоступно или покупки отключены."
             }
           }
         },
@@ -1020,13 +484,125 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "KEYPLO local order ID.",
+            "x-description": {
+              "en": "KEYPLO local order ID.",
+              "ru": "Локальный ID заказа KEYPLO."
+            },
             "schema": {
-              "type": "string",
-              "maxLength": 80,
-              "pattern": "^[A-Za-z0-9_-]+$"
+              "type": "string"
             }
           }
         ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "QuoteRequest": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "quantity",
+          "fields"
+        ],
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "KEYPLO product ID from the catalog.",
+            "x-description": {
+              "en": "KEYPLO product ID from the catalog.",
+              "ru": "ID товара KEYPLO из каталога."
+            }
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Within the product min/max bounds.",
+            "x-description": {
+              "en": "Within the product min/max bounds.",
+              "ru": "В пределах min/max товара."
+            },
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "fields": {
+            "type": "object",
+            "description": "Buyer field key/value strings; use {} if no fields are required.",
+            "x-description": {
+              "en": "Buyer field key/value strings; use {} if no fields are required.",
+              "ru": "Строковые пары ключ/значение полей покупателя; {} без обязательных полей."
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderRequest": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "quantity",
+          "fields",
+          "external_id",
+          "max_total_minor"
+        ],
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "KEYPLO product ID from the catalog.",
+            "x-description": {
+              "en": "KEYPLO product ID from the catalog.",
+              "ru": "ID товара KEYPLO из каталога."
+            }
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Within the product min/max bounds.",
+            "x-description": {
+              "en": "Within the product min/max bounds.",
+              "ru": "В пределах min/max товара."
+            },
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "fields": {
+            "type": "object",
+            "description": "Buyer field key/value strings; use {} if no fields are required.",
+            "x-description": {
+              "en": "Buyer field key/value strings; use {} if no fields are required.",
+              "ru": "Строковые пары ключ/значение полей покупателя; {} без обязательных полей."
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "external_id": {
+            "type": "string",
+            "description": "Your unique order reference, 1–100 letters, digits, dots, colons, underscores or hyphens. Unique per account.",
+            "x-description": {
+              "en": "Your unique order reference, 1–100 letters, digits, dots, colons, underscores or hyphens. Unique per account.",
+              "ru": "Ваш уникальный ID заказа: 1–100 букв, цифр, точек, двоеточий, дефисов или подчёркиваний. Уникален в аккаунте."
+            }
+          },
+          "max_total_minor": {
+            "type": "integer",
+            "description": "Your maximum authorized total in USD cents, taken from the quote. A higher refreshed price stops the purchase.",
+            "x-description": {
+              "en": "Your maximum authorized total in USD cents, taken from the quote. A higher refreshed price stops the purchase.",
+              "ru": "Максимальная разрешённая сумма USD в центах из расчёта. Более высокая цена останавливает покупку."
+            },
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
       }
     }
   }
