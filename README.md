@@ -21,3 +21,5 @@ Prices are USD cents. Never change the idempotency key to retry an uncertain pur
 120 requests/minute/account, 240/IP; JSON max 16 KB; HTTPS and Authorization: Bearer required. Keys are never accepted in query strings.
 
 [Python](./examples/client.py) · [Node.js](./examples/client.mjs) · [PHP](./examples/client.php)
+
+Steam gift browsing uses a first-500-game sample with local pages. Pass a numeric Steam App ID as category_id to retrieve another game directly. Category lists may be cached for five minutes; purchase quotes always refresh prices.
