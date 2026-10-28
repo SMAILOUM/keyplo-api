@@ -6,7 +6,7 @@ Server-side API for account, balance, live catalog, quotes and purchasing. EN/RU
 
 ## Start
 
-1. The owner creates your account and allocates KEYPLO credit.
+1. The owner creates your account. Fund USD credit in Wallet through a FazerCards-issued USDT invoice, or receive owner-managed credit.
 2. Create your API key personally in Integrations; store it only on your server.
 3. Call GET /me and GET /balance.
 4. Browse GET /products?kind=gift_card; choose a category_id to retrieve products.
@@ -23,3 +23,7 @@ Prices are USD cents. Never change the idempotency key to retry an uncertain pur
 [Python](./examples/client.py) · [Node.js](./examples/client.mjs) · [PHP](./examples/client.php)
 
 Steam gift browsing uses a first-500-game sample with local pages. Pass a numeric Steam App ID as category_id to retrieve another game directly. Category lists may be cached for five minutes; purchase quotes always refresh prices.
+
+## Customer top-ups
+
+Wallet creates a personal provider invoice, with payment methods and limits fetched from FazerCards. Send only the exact displayed asset, network, amount and memo. USD credit is added once after the provider confirms both the payment and its completed balance credit. Keep Wallet open for automatic checks or return and press Check payment. Uncertain invoices are not automatically recreated. This is a portal funding flow; no public deposit-creation API endpoint is exposed. No live paid deposit has been verified yet.
